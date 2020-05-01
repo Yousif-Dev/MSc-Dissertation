@@ -32,21 +32,33 @@ class SolarCell(object):
             dateandtimeValue = self.solar_cell.index[i]
             # Gets index of Row
             result_index = self.inverter['Percent'].sub(GHIValue).abs().idxmin()
-            #Clip the power
-            if GHIValue > self.max_power:
-                GHIValue == self.max_power
             # Now we need to multiply Efficiency by it.
-            self.solar_cell.at[dateandtimeValue, "GHI"] = self.solar_cell.at[dateandtimeValue, "GHI"] * \
+            self.solar_cell.at[dateandtimeValue, "GHI"] = GHIValue * \
                                                           self.inverter.at[
                                                               result_index, "Efficiency"] / 100
+            #Clipping the data
+            if self.solar_cell.at[dateandtimeValue, "GHI"] > self.max_power:
+                self.solar_cell.at[dateandtimeValue, "GHI"] = self.max_power
     def total_energy(self):
         return (self.solar_cell["GHI"].sum())
 
 if __name__ == "__main__":
-    solar_cell = SolarCell(
+    list = [100,10000]
+    for i in list:
+        solar_cell_IGBT = SolarCell(
         r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\ss_testbed_irrad_2012.csv",
-        r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\IGBT.csv", 1000)
-    EnergyBefore = solar_cell.total_energy()
-    solar_cell.invert(option="normalise")
-    EnergyAfter = solar_cell.total_energy()
-    print(EnergyBefore,EnergyAfter)
+        r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\IGBT.csv", i)
+
+        EnergyBefore = solar_cell_IGBT.total_energy()
+        solar_cell_IGBT.invert(option="normalise")
+        EnergyAfter = solar_cell_IGBT.total_energy()
+        print(i, "IGBT" , EnergyBefore,EnergyAfter, EnergyAfter/EnergyBefore)
+        solar_cell_SIC = SolarCell(
+            r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\ss_testbed_irrad_2012.csv",
+            r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\SIC.csv", i)
+
+        EnergyBefore = solar_cell_SIC.total_energy()
+        solar_cell_SIC.invert(option="normalise")
+        EnergyAfter = solar_cell_SIC.total_energy()
+        print(i, "SIC", EnergyBefore, EnergyAfter, EnergyAfter/EnergyBefore)
+
