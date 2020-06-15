@@ -37,8 +37,6 @@ def get_ninja_data(latitude=34.125, longitude=39.814, startdate='2015-01-01', en
     parsed_response = json.loads(r.text)
 
     data = pd.read_json(json.dumps(parsed_response['data']), orient='index')
+    data = data.rename(columns ={"electricity": "GHI"})
     return data
 
-
-data = get_ninja_data()
-print(data)

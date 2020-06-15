@@ -5,13 +5,13 @@ import pandas as pd
 import pvlib
 from matplotlib import pyplot as plt
 from pandas.plotting import register_matplotlib_converters
-
+from RenewableNinjaAPI import get_ninja_data
 
 class SolarCell(object):
 
-    def __init__(self, solar_cell_location, inverter_location, maximum_power, loc=[52.4068, 1.5197], tilt=0,
+    def __init__(self, solar_cell_data, inverter_location, maximum_power, loc=[52.4068, 1.5197], tilt=0,
                  azimuth=180, pv_array_size = 1):
-        self.solar_cell = pd.read_csv(solar_cell_location, index_col=0, parse_dates=True)
+        self.solar_cell = solar_cell_data
         self.solar_cell["GHI"] = self.solar_cell["GHI"]*pv_array_size
         self.inverter = pd.read_csv(inverter_location)
         self.max_power = maximum_power
@@ -42,25 +42,15 @@ class SolarCell(object):
                 self.solar_cell.at[dateandtimeValue, "GHI"] = self.max_power
 
     def total_energy(self):
-        return (self.solar_cell["GHI"].sum())
+        return self.solar_cell["GHI"].sum()
 
 
 if __name__ == "__main__":
     #The main event am I right
-    inverter_list = ["PVI-10.0-I-OUTD", "SG3150U", "STP10.0-3AV-40", "SIC Inverter"]
-    option_list = ["percent", "percent", "percent", "normalise"]
-    capacity_list = np.linspace(5,20, num = 10)
-    column_names = ["Model", "Capacity", "Efficiency"]
-    output_df = pd.DataFrame(columns = column_names)
-    for i in range(len(inverter_list)):
-        for X in range(len(capacity_list)):
-            solar_cell = SolarCell(
-                r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\CM_SAF-2015.csv",
-                r"C:\Users\Coco\Desktop\Personal Folder\Study\-MSc\Dissertation\Data\Industrial Inverters\\" + str(inverter_list[i]) + ".csv", 10, pv_array_size=capacity_list[X])
-
-            EnergyBefore = solar_cell.total_energy()
-            solar_cell.invert(option=option_list[i])
-            EnergyAfter = solar_cell.total_energy()
-            output_df.loc[len(output_df)] = [inverter_list[i],capacity_list[X],EnergyAfter/EnergyBefore]
-    print(output_df)
-    output_df.to_csv("DifferentPVSizes.csv")
+    SCData = get_ninja_data()
+    solar_cell = SolarCell(
+        SCData,
+        r"D:\Personal Folder\Study\-MSc\Dissertation\Data\Industrial Inverters\PVI-10.0-I-OUTD.csv", 10)
+    print(solar_cell.total_energy())
+    solar_cell.invert(option = "percent")
+    print(solar_cell.total_energy())
