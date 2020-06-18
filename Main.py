@@ -6,6 +6,7 @@ import pvlib
 from matplotlib import pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 from RenewableNinjaAPI import get_ninja_data
+from Finance import financial_calculator
 
 class SolarCell(object):
 
@@ -47,10 +48,12 @@ class SolarCell(object):
 
 if __name__ == "__main__":
     #The main event am I right
-    SCData = get_ninja_data()
+    SCData = get_ninja_data(startdate= "2016-01-01", enddate= "2016-12-31")
     solar_cell = SolarCell(
         SCData,
         r"D:\Personal Folder\Study\-MSc\Dissertation\Data\Industrial Inverters\PVI-10.0-I-OUTD.csv", 10)
-    print(solar_cell.total_energy())
+    print("Printing money generated before inverter \n")
+    print(financial_calculator(solar_cell.return_cell()))
     solar_cell.invert(option = "percent")
-    print(solar_cell.total_energy())
+    print("Printing money generated after inverter \n")
+    print(financial_calculator(solar_cell.return_cell()))

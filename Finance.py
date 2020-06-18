@@ -1,11 +1,15 @@
 import pandas as pd
-from datetime import datetime
-from RenewableNinjaAPI import get_ninja_data
-SD = "2016-01-01"
-ED = "2017-01-01"
-solar_panda = get_ninja_data(startdate=SD, enddate=ED)
-money = pd.read_csv("epex_UK_half_hourly_day_ahead_prices.csv" , parse_dates=["timestamp"])
-#print(money.loc[money['timestamp'] == date, ['price']])
-totalcash = pd.DataFrame()
-x = 0
-print(solar_panda.index[0])
+
+
+def financial_calculator(solar_data):
+    """Returns a financial figure in £ of how much money you would generate by selling electricity from solar
+    cell, takes solar cell data and dates"""
+    money = pd.read_csv("epex_UK_half_hourly_day_ahead_prices.csv" , parse_dates=["timestamp"])
+    money_resampled = money.resample("H", on = "timestamp").mean()
+    final_cash = 0
+    for i in range(len(solar_data)):
+        GHIValue = solar_data["GHI"].iloc[i]
+        dateandtimeValue = solar_data.index[i]
+        money_generated = GHIValue * money_resampled.loc[money_resampled.index == dateandtimeValue]["price"].values[0]
+        final_cash += money_generated
+    return (final_cash/1000)
