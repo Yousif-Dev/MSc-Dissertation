@@ -7,3 +7,5 @@
 .idea/workspace.xml
 *.csv
 APIToken.txt
+__pycache__/Finance.cpython-36.pyc
+__pycache__/RenewableNinjaAPI.cpython-36.pyc
