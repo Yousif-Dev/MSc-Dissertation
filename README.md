@@ -8,8 +8,8 @@ Project is being developed for ExaWatt in fulfillment of MSc Dissertation requir
 
   - Integration with Renewables Ninja API to pull PV generation datasets.
   - Integration with inverter efficiency curves to calculate losses.
-
+  - Integrated a Financial module to convert the energy figure into GBP.
+ 
 ### Todos
 
- - Work on integrating cost-benefit analysis
  - Integrate ESS system
