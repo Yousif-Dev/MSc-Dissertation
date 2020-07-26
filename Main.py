@@ -15,6 +15,9 @@ class SolarCell(object):
         self.solar_cell = solar_cell_data
         self.solar_cell["GHI"] = self.solar_cell["GHI"]*pv_array_size
         self.inverter = pd.read_csv(inverter_location)
+        #This line is to fix the output power issue encountered in efficiency curves.
+        #That is, it turns output power on the x-axis to input power
+        self.inverter["Percent"] = self.inverter["Percent"] * (self.inverter["Efficiency"]/100)
         self.max_power = maximum_power
         self.loc = loc
         self.tilt = tilt
@@ -48,12 +51,20 @@ class SolarCell(object):
 
 if __name__ == "__main__":
     #The main event am I right
-    SCData = get_ninja_data(startdate= "2016-01-01", enddate= "2016-12-31")
-    solar_cell = SolarCell(
-        SCData,
-        r"D:\Personal Folder\Study\-MSc\Dissertation\Data\Industrial Inverters\PVI-10.0-I-OUTD.csv", 10)
-    print("Printing money generated before inverter \n")
-    print(financial_calculator(solar_cell.return_cell()))
-    solar_cell.invert(option = "percent")
-    print("Printing money generated after inverter \n")
-    print(financial_calculator(solar_cell.return_cell()))
+    SC_Data = get_ninja_data()
+    inverter_list = ["Fronius_Inverter", "Huwaei_Inverter", "SIC_Inverter", "SMA_Inverter","Sungrow_Inverter"]
+    capacity_list = np.linspace(5,15, num = 10)
+    column_names = ["Model", "Capacity", "MoneyGained"]
+    output_df = pd.DataFrame(columns = column_names)
+    for i in range(len(inverter_list)):
+        for X in range(len(capacity_list)):
+            data_copy = SC_Data.copy()
+            solar_cell = SolarCell(
+                data_copy,
+                r"D:\Personal Folder\Study\-MSc\Dissertation\Data\Industrial Inverters\\" + str(inverter_list[i]) + ".csv", 10, pv_array_size=capacity_list[X])
+
+            solar_cell.invert(option="percent")
+            money = financial_calculator(solar_cell.return_cell())
+            output_df.loc[len(output_df)] = [inverter_list[i],capacity_list[X],money]
+    print(output_df)
+    output_df.to_csv("DifferentPVSizes_5.csv")

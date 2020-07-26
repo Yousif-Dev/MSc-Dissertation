@@ -3,7 +3,7 @@ import pandas as pd
 import json
 
 
-def get_ninja_data(latitude=34.125, longitude=39.814, startdate='2015-01-01', enddate='2015-12-31', dataset="merra2",
+def get_ninja_data(latitude=53.383331, longitude= -1.466667, startdate='2016-01-01', enddate='2016-12-31', dataset="merra2",
                    capacity=1.0, systemloss=0.1, tilt=35, azimuth=180):
     """This function gets PV data from renewables.ninja and takes common arguments such as location, dates, dataset,
      capacity, loss, and orientation"""
