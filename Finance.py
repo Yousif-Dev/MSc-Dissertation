@@ -12,5 +12,4 @@ def financial_calculator(solar_data):
         dateandtimeValue = solar_data.index[i]
         money_generated = GHIValue * money_resampled.loc[money_resampled.index == dateandtimeValue]["price"].values[0]
         final_cash += money_generated
-    # /1000 because ninja gives figure in Watts
-    return (final_cash/1000)
+    return (final_cash)
